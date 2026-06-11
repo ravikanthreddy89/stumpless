@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "VC Wallet",
+    "slug": "vc-wallet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.vcplatform.wallet",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera is needed to scan credential QR codes"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.vcplatform.wallet",
+      "permissions": ["CAMERA"]
+    },
+    "plugins": [
+      ["expo-camera", { "cameraPermission": "Allow VC Wallet to use your camera to scan QR codes." }],
+      "expo-secure-store"
+    ]
+  }
+}

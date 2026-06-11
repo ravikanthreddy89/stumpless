@@ -1,0 +1,12 @@
+{
+  "name": "vc-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "issuer": "npm run dev --workspace=packages/issuer",
+    "verifier": "npm run dev --workspace=packages/verifier",
+    "wallet": "npm run start --workspace=packages/wallet",
+    "build": "npm run build --workspaces --if-present"
+  }
+}
