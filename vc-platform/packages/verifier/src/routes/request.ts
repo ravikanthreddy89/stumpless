@@ -6,7 +6,7 @@ import { VerifierConfig, PresentationRequest } from '../types';
 export function requestRouter(verifierConfig: VerifierConfig): Router {
   const router = Router();
 
-  router.post('/presentations/requests', (req: Request, res: Response) => {
+  router.post('/presentations/requests', async (req: Request, res: Response) => {
     const { credentialTypes = ['VerifiableCredential'] } = req.body as { credentialTypes?: string[] };
 
     const state = randomUUID();
@@ -43,7 +43,7 @@ export function requestRouter(verifierConfig: VerifierConfig): Router {
       expires_at: Date.now() + 10 * 60 * 1000,
     };
 
-    requestStore.set(state, presentationRequest);
+    await requestStore.set(state, presentationRequest);
 
     const params = new URLSearchParams({
       response_type: presentationRequest.response_type,
@@ -68,8 +68,8 @@ export function requestRouter(verifierConfig: VerifierConfig): Router {
     });
   });
 
-  router.get('/presentations/results/:state', (req: Request, res: Response) => {
-    const result = resultStore.get(req.params.state);
+  router.get('/presentations/results/:state', async (req: Request, res: Response) => {
+    const result = await resultStore.get(req.params.state);
     if (!result) {
       return res.status(202).json({ status: 'pending' });
     }

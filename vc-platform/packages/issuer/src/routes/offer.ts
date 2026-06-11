@@ -6,8 +6,7 @@ import { IssuerConfig, PendingOffer } from '../types';
 export function offerRouter(issuerConfig: IssuerConfig): Router {
   const router = Router();
 
-  // Admin endpoint: create a credential offer
-  router.post('/offers', (req: Request, res: Response) => {
+  router.post('/offers', async (req: Request, res: Response) => {
     const { credentialType, subjectData, requirePin } = req.body as {
       credentialType: string;
       subjectData: Record<string, unknown>;
@@ -25,11 +24,11 @@ export function offerRouter(issuerConfig: IssuerConfig): Router {
       preAuthorizedCode,
       credentialType,
       subjectData,
-      expiresAt: Date.now() + 10 * 60 * 1000, // 10 min
+      expiresAt: Date.now() + 10 * 60 * 1000,
       pin,
     };
 
-    offerStore.set(preAuthorizedCode, offer);
+    await offerStore.set(preAuthorizedCode, offer);
 
     const offerUri = {
       credential_issuer: issuerConfig.issuerUrl,

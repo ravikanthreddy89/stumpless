@@ -18,9 +18,9 @@ export function credentialRouter(issuerConfig: IssuerConfig): Router {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const tokenData = tokenStore.get(token);
+    const tokenData = await tokenStore.get(token);
     if (!tokenData || Date.now() > tokenData.expiresAt) {
-      tokenStore.delete(token);
+      await tokenStore.delete(token);
       return res.status(401).json({ error: 'invalid_token', error_description: 'Token expired or invalid' });
     }
 
@@ -43,11 +43,11 @@ export function credentialRouter(issuerConfig: IssuerConfig): Router {
         return res.status(400).json({ error: 'invalid_or_missing_proof', error_description: 'Invalid nonce' });
       }
 
-      if (nonceStore.isUsed(tokenData.cNonce)) {
+      if (await nonceStore.isUsed(tokenData.cNonce)) {
         return res.status(400).json({ error: 'invalid_or_missing_proof', error_description: 'Nonce already used' });
       }
 
-      nonceStore.markUsed(tokenData.cNonce);
+      await nonceStore.markUsed(tokenData.cNonce);
 
       const kid = header.kid as string;
       if (!kid?.startsWith('did:key:')) {
@@ -66,7 +66,7 @@ export function credentialRouter(issuerConfig: IssuerConfig): Router {
       tokenData.subjectData
     );
 
-    tokenStore.delete(token);
+    await tokenStore.delete(token);
 
     return res.json({
       format: 'jwt_vc_json',

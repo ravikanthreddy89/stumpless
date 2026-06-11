@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { offerStore, tokenStore } from '../services/store';
 import { IssuerConfig, IssuedToken } from '../types';
 
-export function tokenRouter(issuerConfig: IssuerConfig): Router {
+export function tokenRouter(_issuerConfig: IssuerConfig): Router {
   const router = Router();
 
   router.post('/token', async (req: Request, res: Response) => {
@@ -21,13 +21,13 @@ export function tokenRouter(issuerConfig: IssuerConfig): Router {
       return res.status(400).json({ error: 'invalid_request', error_description: 'pre-authorized_code required' });
     }
 
-    const offer = offerStore.get(preAuthCode);
+    const offer = await offerStore.get(preAuthCode);
     if (!offer) {
       return res.status(400).json({ error: 'invalid_grant', error_description: 'Invalid or expired pre-authorized_code' });
     }
 
     if (Date.now() > offer.expiresAt) {
-      offerStore.delete(preAuthCode);
+      await offerStore.delete(preAuthCode);
       return res.status(400).json({ error: 'invalid_grant', error_description: 'pre-authorized_code expired' });
     }
 
@@ -35,7 +35,7 @@ export function tokenRouter(issuerConfig: IssuerConfig): Router {
       return res.status(400).json({ error: 'invalid_grant', error_description: 'Invalid PIN' });
     }
 
-    offerStore.delete(preAuthCode);
+    await offerStore.delete(preAuthCode);
 
     const accessToken = randomUUID();
     const cNonce = randomUUID();
@@ -48,7 +48,7 @@ export function tokenRouter(issuerConfig: IssuerConfig): Router {
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
 
-    tokenStore.set(accessToken, tokenData);
+    await tokenStore.set(accessToken, tokenData);
 
     return res.json({
       access_token: accessToken,
